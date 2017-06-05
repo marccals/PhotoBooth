@@ -1,6 +1,6 @@
 import RPi.GPIO as GPIO
 import time
-
+import threading
 
 class BlinkingLed:
     """Helper class for blinking leds."""
@@ -13,6 +13,8 @@ class BlinkingLed:
 
         self.__isBlinking = False
         self.__sleep_time = 0.1
+
+        self.__parallel_thread = None
 
         self.__setup_GPIO_channel()
 
@@ -45,7 +47,7 @@ class BlinkingLed:
         """returns boolean indicating if led is on"""
         return GPIO.input(self.__GPIO_channel) == GPIO.HIGH
 
-    def start(self):
+    def start_blinking(self):
         """Start blinking led"""
 
         time_to_switch_led_state =  self.__blinking_time
@@ -64,7 +66,18 @@ class BlinkingLed:
         """Be sure that led always is off before exit"""
         self.__turn_off_led()
 
+    def start(self, run_in_parallel):
+        """Runs blinking led in a parallel thread to don't block main thread"""
+
+        if (run_in_parallel):
+            self.__parallel_thread = threading.Thread(target=self.start_blinking)
+            self.__parallel_thread.start()
+        else:
+            self.start_blinking()
+
     def stop(self):
         """Stop blinking led"""
-
         self.__isBlinking = False
+
+        if (self.__parallel_thread is not None):
+            self.__parallel_thread.join(1)
