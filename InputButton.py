@@ -2,7 +2,7 @@ import RPi.GPIO as GPIO
 
 
 class InputButton:
-    """Helper class for blinking leds."""
+    """Helper class for detect input buttons"""
 
     def __init__(self, GPIO_channel):
 
