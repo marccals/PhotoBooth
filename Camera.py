@@ -6,6 +6,7 @@ import numpy as np
 
 class Camera:
     def __init__(self):
+        self.__cancel_countdown = False
         self.__picamera = PiCamera()
         self.__counter_pad = {
             5: self.__get_image_pad(self.__get_countdown_image_path(5)),
@@ -30,6 +31,7 @@ class Camera:
         self.__picamera.stop_preview()
 
     def capture(self, path):
+        self.__cancel_countdown = False
         self.startCountDown(3)
 
         self.__picamera.capture(path)
@@ -43,6 +45,8 @@ class Camera:
             time.sleep(0.9) #0.9
             self.__picamera.remove_overlay(o)
             time.sleep(0.1)
+            if (self.__cancel_countdown):
+                break;
 
     def __get_countdown_image_path(self, number):
 
@@ -55,6 +59,9 @@ class Camera:
         }
 
         return switcher.get(number)
+
+    def cancel_countdown(self):
+        self.__cancel_countdown = True
 
     def preview_captured_image_and_wait_for_print_cancel(self, seconds):
 
