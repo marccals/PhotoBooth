@@ -2,7 +2,6 @@ import time
 
 from picamera import PiCamera
 from PIL import Image
-import numpy as np
 
 class Camera:
     def __init__(self):
@@ -34,6 +33,7 @@ class Camera:
         self.__cancel_countdown = False
         self.startCountDown(3)
 
+        self.__capture_image_path = path
         self.__picamera.capture(path)
 
     def startCountDown(self, seconds):
@@ -65,7 +65,7 @@ class Camera:
 
     def preview_captured_image_and_wait_for_print_cancel(self, seconds):
 
-        pad = self.__get_image_pad('test.png')
+        pad = self.__get_image_pad(self.__capture_image_path)
 
         o = self.__picamera.add_overlay(pad.tostring())
         o.layer = 3
