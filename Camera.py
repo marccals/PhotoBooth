@@ -88,12 +88,4 @@ class Camera:
 
         return pad
 
-        # Add the overlay with the padded image as the source,
-        # but the original image's dimensions
-
-        # By default, the overlay is in layer 0, beneath the
-        # preview (which defaults to layer 2). Here we make
-        # the new overlay semi-transparent, then move it above
-        # the preview
-
 
