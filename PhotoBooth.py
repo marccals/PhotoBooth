@@ -4,22 +4,23 @@ from Camera import Camera
 from PhotoPathUtils import PhotoPathUtils
 
 import subprocess
+import os
+import signal
 
+compose_and_print_process = None
 
-cancel_print_button_pressed = False
+def cancel_print(bin_var):
+    global compose_and_print_process
 
-def cancel_print():
-    global cancel_print_button_pressed
-
+    os.killpg(os.getpgid(compose_and_print_process.pid), signal.SIGTERM)
     picam.cancel_countdown()
-    cancel_print_button_pressed = True
+
 
 def composed_and_print_captured_image(photo_path):
+    global compose_and_print_process
     composed_photo_path = PhotoPathUtils.get_composed_photo_path(photo_path)
 
-    print ("./ComposeAndPrint.sh " + photo_path + " " + composed_photo_path)
-
-    subprocess.Popen('./ComposeAndPrint.sh ' + photo_path + ' ' + composed_photo_path, shell=True)
+    compose_and_print_process = subprocess.Popen('./ComposeAndPrint.sh ' + photo_path + ' ' + composed_photo_path, stdout=subprocess.PIPE, shell=True, preexec_fn=os.setsid)
 
 picam = Camera()
 
@@ -42,6 +43,7 @@ blinking_led_capture_button.stop()
 
 photo_path = PhotoPathUtils.get_photo_path()
 picam.capture(photo_path)
+composed_and_print_captured_image(photo_path)
 
 input_cancel_print_button.wait_for_event(cancel_print)
 
@@ -50,10 +52,5 @@ picam.preview_captured_image_and_wait_for_print_cancel(5)
 input_cancel_print_button.cancel_wait_for_event()
 blinking_led_cancel_print_button.stop()
 
-if (not cancel_print_button_pressed):
-    composed_and_print_captured_image(photo_path)
-
 picam.stop_preview()
-
-
 
