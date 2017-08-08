@@ -15,6 +15,8 @@ class Camera:
             1: self.__get_image_pad(self.__get_countdown_image_path(1))
         }
 
+        self.__cancel_button_image_pad = self.__get_image_pad("images/CancelButtonImage.png")
+
     def __del__(self):
         self.__picamera.close()
 
@@ -70,8 +72,12 @@ class Camera:
         o = self.__picamera.add_overlay(pad.tostring())
         o.layer = 3
 
+        cancel_print_image_pad = self.__picamera.add_overlay(self.__cancel_button_image_pad.tostring())
+        cancel_print_image_pad.layer = 4
+
         self.startCountDown(seconds)
         self.__picamera.remove_overlay(o)
+        self.__picamera.remove_overlay(cancel_print_image_pad)
 
     def __get_image_pad(self, path_image):
         # Load the arbitrarily sized image
