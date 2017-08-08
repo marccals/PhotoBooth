@@ -22,6 +22,7 @@ def composed_and_print_captured_image(photo_path):
 
     compose_and_print_process = subprocess.Popen('./ComposeAndPrint.sh ' + photo_path + ' ' + composed_photo_path, stdout=subprocess.PIPE, shell=True, preexec_fn=os.setsid)
 
+
 picam = Camera()
 
 picam.framerate = 25
@@ -29,28 +30,25 @@ picam.start_preview()
 
 blinking_led_capture_button = BlinkingLed(18, 0.5)
 blinking_led_cancel_print_button = BlinkingLed(7, 0.5)
-blinking_led_cancel_print_button.start(run_in_parallel = True)
 
 input_capture_button = InputButton(4)
 input_cancel_print_button = InputButton(11)
 
-blinking_led_capture_button.start(run_in_parallel = True)
+while (True):
+    blinking_led_capture_button.start(run_in_parallel = True)
+    input_capture_button.wait_for_input()
+    blinking_led_capture_button.stop()
 
-input_capture_button.wait_for_input()
-#input_cancel_print_button.wait_for_input()
+    photo_path = PhotoPathUtils.get_photo_path()
+    picam.capture(photo_path)
+    composed_and_print_captured_image(photo_path)
 
-blinking_led_capture_button.stop()
+    blinking_led_cancel_print_button.start(run_in_parallel = True)
+    input_cancel_print_button.wait_for_event(cancel_print)
+    picam.preview_captured_image_and_wait_for_print_cancel(5)
 
-photo_path = PhotoPathUtils.get_photo_path()
-picam.capture(photo_path)
-composed_and_print_captured_image(photo_path)
-
-input_cancel_print_button.wait_for_event(cancel_print)
-
-picam.preview_captured_image_and_wait_for_print_cancel(5)
-
-input_cancel_print_button.cancel_wait_for_event()
-blinking_led_cancel_print_button.stop()
+    input_cancel_print_button.cancel_wait_for_event()
+    blinking_led_cancel_print_button.stop()
 
 picam.stop_preview()
 
