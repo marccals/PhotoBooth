@@ -34,21 +34,28 @@ blinking_led_cancel_print_button = BlinkingLed(7, 0.5)
 input_capture_button = InputButton(4)
 input_cancel_print_button = InputButton(11)
 
-while (True):
-    blinking_led_capture_button.start(run_in_parallel = True)
-    input_capture_button.wait_for_input()
-    blinking_led_capture_button.stop()
+try:
 
-    photo_path = PhotoPathUtils.get_photo_path()
-    picam.capture(photo_path)
-    composed_and_print_captured_image(photo_path)
+    while (True):
+        blinking_led_capture_button.start(run_in_parallel = True)
+        input_capture_button.wait_for_input()
+        blinking_led_capture_button.stop()
 
-    blinking_led_cancel_print_button.start(run_in_parallel = True)
-    input_cancel_print_button.wait_for_event(cancel_print)
-    picam.preview_captured_image_and_wait_for_print_cancel(5)
+        photo_path = PhotoPathUtils.get_photo_path()
+        picam.capture(photo_path)
+        composed_and_print_captured_image(photo_path)
 
+        blinking_led_cancel_print_button.start(run_in_parallel = True)
+        input_cancel_print_button.wait_for_event(cancel_print)
+        picam.preview_captured_image_and_wait_for_print_cancel(5)
+
+        input_cancel_print_button.cancel_wait_for_event()
+        blinking_led_cancel_print_button.stop()
+
+except KeyboardInterrupt:
     input_cancel_print_button.cancel_wait_for_event()
     blinking_led_cancel_print_button.stop()
+    blinking_led_capture_button.stop()
 
 picam.stop_preview()
 

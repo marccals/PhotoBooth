@@ -1,4 +1,5 @@
 import RPi.GPIO as GPIO
+import time
 
 
 class InputButton:
@@ -30,4 +31,12 @@ class InputButton:
         GPIO.remove_event_detect(self.__GPIO_channel)
 
     def wait_for_input(self):
-        GPIO.wait_for_edge(self.__GPIO_channel, GPIO.FALLING)
+        try:
+            GPIO.add_event_detect(self.__GPIO_channel, GPIO.FALLING)
+
+            while True:
+                time.sleep(0.1)
+                if (GPIO.event_detected(self.__GPIO_channel)):
+                    break;
+        except KeyboardInterrupt:
+            raise
