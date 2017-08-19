@@ -10,6 +10,7 @@ class InputButton:
         self.__GPIO_channel = GPIO_channel
 
         self.__setup_GPIO_channel()
+        self.__waiting_for_input = False
 
         return
 
@@ -32,7 +33,9 @@ class InputButton:
 
     def wait_for_input(self):
         try:
-            GPIO.add_event_detect(self.__GPIO_channel, GPIO.FALLING)
+            if (not self.__waiting_for_input):
+                GPIO.add_event_detect(self.__GPIO_channel, GPIO.FALLING, bouncetime=500)
+                self.__waiting_for_input = True
 
             while True:
                 time.sleep(0.1)
