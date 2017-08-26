@@ -26,10 +26,15 @@ class InputButton:
 
     def wait_for_event(self, callback_event):
         GPIO.add_event_detect(self.__GPIO_channel, GPIO.FALLING)
+
         GPIO.add_event_callback(self.__GPIO_channel, callback_event)
 
     def cancel_wait_for_event(self):
         GPIO.remove_event_detect(self.__GPIO_channel)
+
+    def check_button_is_pressed(self):
+        """Detected some electronical devices generate interferences, causing false input events. This method check that button has been really pressed"""
+        return GPIO.input(self.__GPIO_channel) == GPIO.LOW
 
     def wait_for_input(self):
         try:
@@ -39,7 +44,7 @@ class InputButton:
 
             while True:
                 time.sleep(0.1)
-                if (GPIO.event_detected(self.__GPIO_channel)):
+                if (self.check_button_is_pressed()) :
                     break;
         except KeyboardInterrupt:
             raise
